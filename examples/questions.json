@@ -1,0 +1,55 @@
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Questions — board games",
+  "dateModified": "2026-06-08T02:00:00.000Z",
+  "itemListElement": [
+    {
+      "@type": "Question",
+      "position": 1,
+      "text": "What board game is best for a family with children aged 8 to 12?",
+      "suggestedAnswer": {
+        "@type": "Answer",
+        "url": "https://agenticfeed.ai/product/a9a8378c94/b3f1e29a4c.json"
+      }
+    },
+    {
+      "@type": "Question",
+      "position": 2,
+      "text": "Which strategy board games are good for two players?",
+      "suggestedAnswer": {
+        "@type": "Answer",
+        "url": "https://agenticfeed.ai/product/a9a8378c94/d7a4c81b3e.json"
+      }
+    },
+    {
+      "@type": "Question",
+      "position": 3,
+      "text": "What is a good board game for a group of six adults?",
+      "suggestedAnswer": {
+        "@type": "Answer",
+        "url": "https://agenticfeed.ai/product/a9a8378c94/f2c9d53a17.json"
+      }
+    }
+  ],
+  "agenticfeed": {
+    "service": "agenticfeed",
+    "version": "0.614",
+    "customer": "a9a8378c94",
+    "category": "board games",
+    "questions": [
+      {
+        "question": "What board game is best for a family with children aged 8 to 12?",
+        "url": "https://agenticfeed.ai/product/a9a8378c94/b3f1e29a4c.json"
+      },
+      {
+        "question": "Which strategy board games are good for two players?",
+        "url": "https://agenticfeed.ai/product/a9a8378c94/d7a4c81b3e.json"
+      },
+      {
+        "question": "What is a good board game for a group of six adults?",
+        "url": "https://agenticfeed.ai/product/a9a8378c94/f2c9d53a17.json"
+      }
+    ]
+  }
+}

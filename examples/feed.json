@@ -1,0 +1,55 @@
+{
+  "@context": "https://schema.org",
+  "@type": "DataFeed",
+  "name": "Agentic Feed for Board Game Extras",
+  "url": "https://agenticfeed.ai/feed/a9a8378c94.json",
+  "dateModified": "2026-06-08T02:00:00.000Z",
+  "provider": {
+    "@type": "Organization",
+    "name": "Agenticfeed",
+    "url": "https://agenticfeed.ai"
+  },
+  "about": {
+    "@type": "Organization",
+    "name": "Board Game Extras",
+    "url": "https://www.boardgameextras.co.uk"
+  },
+  "dataFeedElement": [
+    {
+      "@type": "DataFeedItem",
+      "name": "Questions",
+      "url": "https://agenticfeed.ai/questions/a9a8378c94.json",
+      "description": "Common questions customers ask — match to find relevant products"
+    },
+    {
+      "@type": "DataFeedItem",
+      "name": "Problems",
+      "url": "https://agenticfeed.ai/problems/a9a8378c94.json",
+      "description": "Pain points and frustrations — match to find solutions"
+    },
+    {
+      "@type": "DataFeedItem",
+      "name": "Use Cases",
+      "url": "https://agenticfeed.ai/use_cases/a9a8378c94.json",
+      "description": "Scenarios and goals — match to find suitable products"
+    }
+  ],
+  "agenticfeed": {
+    "service": "agenticfeed",
+    "version": "0.614",
+    "purpose": "AI-readable discovery feed — match customer intent to products",
+    "instructions": "To find relevant products: (1) Fetch one or more discovery URLs based on the customer's intent. (2) Match against questions, problems, or use_cases to find relevant entries and extract productId values. (3) Fetch the full product detail URL for each matched productId using the resolution template.",
+    "workflow": [
+      "Fetch one or more discovery URLs based on customer intent (questions, problems, or use_cases)",
+      "Match entries to the customer's query and extract productId values from results",
+      "Replace {productId} in resolution.product.url with each matched productId to fetch full product details"
+    ],
+    "resolution": {
+      "product": {
+        "url": "https://agenticfeed.ai/product/a9a8378c94/{productId}.json",
+        "description": "Fetch full product detail after a discovery match",
+        "note": "Replace {productId} with the id field returned in discovery results"
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+# Agenticfeed — github.com/bluestratus/agenticfeed
+
+> A lightweight open specification for making ecommerce product catalogues readable by AI shopping agents.
+
+The Agenticfeed Standard defines how merchants expose structured product data for AI agents to discover, reason about, and recommend products in conversational shopping contexts.
+
+## What this repository contains
+
+- [README.md](README.md) — full specification
+- [examples/feed.json](examples/feed.json) — feed index (DataFeed, schema.org)
+- [examples/product.json](examples/product.json) — product detail (Product, schema.org)
+- [examples/questions.json](examples/questions.json) — buyer questions endpoint (ItemList of Question)
+- [examples/problems.json](examples/problems.json) — buyer problems endpoint (ItemList)
+- [examples/use-cases.json](examples/use-cases.json) — use cases endpoint (ItemList)
+- [examples/link-tag.html](examples/link-tag.html) — discovery tag snippet
+
+## Key concepts
+
+- Merchants add `<link rel="agenticfeed" type="application/json" href="...">` to their page `<head>` for autodiscovery
+- The feed index is a schema.org `DataFeed` pointing to intent endpoints
+- Intent endpoints are schema.org `ItemList` documents containing `Question` and `ListItem` entries linked to products
+- Product detail documents are schema.org `Product` with an `agenticfeed` namespace for questions, problems, and use cases
+- All product URLs include UTM parameters for attribution tracking
+
+## Reference implementation
+
+The reference implementation is available at https://agenticfeed.ai
+
+Agenticfeed automatically generates intent data (questions, problems, use cases) for merchant product catalogues using AI, publishes feeds conforming to this standard, and handles daily stock synchronisation.

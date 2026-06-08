@@ -1,0 +1,46 @@
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Problems — board games",
+  "dateModified": "2026-06-08T02:00:00.000Z",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "I need a game the whole family can play together without arguments",
+      "url": "https://agenticfeed.ai/product/a9a8378c94/b3f1e29a4c.json"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "I want a game that teaches strategic thinking to teenagers",
+      "url": "https://agenticfeed.ai/product/a9a8378c94/d7a4c81b3e.json"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "I need a game that works for large groups without taking all evening",
+      "url": "https://agenticfeed.ai/product/a9a8378c94/f2c9d53a17.json"
+    }
+  ],
+  "agenticfeed": {
+    "service": "agenticfeed",
+    "version": "0.614",
+    "customer": "a9a8378c94",
+    "category": "board games",
+    "problems": [
+      {
+        "problem": "I need a game the whole family can play together without arguments",
+        "url": "https://agenticfeed.ai/product/a9a8378c94/b3f1e29a4c.json"
+      },
+      {
+        "problem": "I want a game that teaches strategic thinking to teenagers",
+        "url": "https://agenticfeed.ai/product/a9a8378c94/d7a4c81b3e.json"
+      },
+      {
+        "problem": "I need a game that works for large groups without taking all evening",
+        "url": "https://agenticfeed.ai/product/a9a8378c94/f2c9d53a17.json"
+      }
+    ]
+  }
+}
