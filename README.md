@@ -1,36 +1,175 @@
-# The Agenticfeed Standard
+# Agenticfeed Standard
 
-A lightweight open specification for making ecommerce product catalogues readable by AI shopping agents.
+[![Version](https://img.shields.io/badge/version-0.1.0-72e0a8)](https://github.com/bluestratus/agenticfeed/releases/tag/v0.1.0)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Reference implementation](https://img.shields.io/badge/reference_implementation-agenticfeed.ai-0d0d1a)](https://agenticfeed.ai)
 
-**Reference implementation:** [agenticfeed.ai](https://agenticfeed.ai)
+**An open specification for making ecommerce product catalogues readable by AI shopping agents.**
 
----
+AI assistants like ChatGPT, Claude, Perplexity, and Gemini are already recommending products to millions of shoppers. They do not browse category pages or read banner ads. They consume structured data and reason about which products best match the buyer's intent. Most merchant websites are invisible to them.
 
-## What is an Agentic Feed?
-
-An agentic feed is a structured, machine-readable product data stream designed for AI agents rather than human browsers. Where a traditional product page is built for visual rendering, an agentic feed is built for reasoning.
-
-AI shopping assistants like ChatGPT, Claude, Perplexity, and Gemini do not browse category pages or read banner ads. They consume structured data and use it to match buyer intent to products. An agentic feed gives them that data in a format they can work with directly.
-
-The standard has three components:
-
-1. **Discovery** — a `<link>` tag in the page `<head>` that tells crawlers and agents where the feed lives
-2. **Feed index** — a JSON-LD document at a stable URL that describes the merchant and points to intent endpoints
-3. **Intent endpoints** — structured lists of questions, problems, and use cases that connect buyer intent to specific products
+This standard defines a lightweight, discoverable format that gives AI agents exactly what they need.
 
 ---
 
-## 1. Discovery Tag
+## Quick start
 
-Add one line to the `<head>` of every page on the merchant's website:
+Add one line to the `<head>` of every page on your website:
 
 ```html
-<link rel="agenticfeed" type="application/json" href="https://agenticfeed.ai/feed/{customer_guid}.json">
+<link rel="agenticfeed" type="application/json" href="https://yourdomain.com/feed.json">
 ```
 
-This follows the same autodiscovery pattern as RSS (`rel="alternate"`) and favicon (`rel="icon"`). Any AI agent or crawler that checks page headers will find the feed without being told the URL.
+That tag tells any AI agent or crawler where your structured product feed lives. The rest of this document describes what that feed should contain.
 
-**Attributes:**
+---
+
+## Contents
+
+- [What is an agentic feed?](#what-is-an-agentic-feed)
+- [Why does this standard exist?](#why-does-this-standard-exist)
+- [How is it different from a Google Merchant Center feed?](#how-is-it-different-from-a-google-merchant-center-feed)
+- [How do AI agents discover it?](#how-do-ai-agents-discover-it)
+- [How do I add it to my website?](#how-do-i-add-it-to-my-website)
+- [Specification](#specification)
+  - [1. Discovery tag](#1-discovery-tag)
+  - [2. Feed index](#2-feed-index)
+  - [3. Intent endpoints](#3-intent-endpoints)
+  - [4. Product detail](#4-product-detail)
+  - [5. UTM attribution](#5-utm-attribution)
+  - [6. Link validation](#6-link-validation)
+- [Examples](#examples)
+- [Reference implementation](#reference-implementation)
+- [Contributing](#contributing)
+- [Licence](#licence)
+
+---
+
+## What is an agentic feed?
+
+An agentic feed is a structured product data feed built for AI agents rather than search engine crawlers or human browsers.
+
+A traditional product page is designed to be rendered and read by a person. A Google Merchant Center feed is designed to be parsed by a price comparison engine. An agentic feed is designed to be reasoned about by an AI.
+
+The key difference is intent data. Where a merchant feed tells an agent "here is a cordless drill, it costs £29.99 and it is in stock," an agentic feed tells it "here is a cordless drill that answers the question *what drill do I need for assembling flat-pack furniture*, solves the problem *I keep stripping screws with my old drill*, and fits the use case *home DIY for a first-time homeowner*."
+
+That is the layer of context an AI agent needs to make a confident recommendation to a specific buyer.
+
+---
+
+## Why does this standard exist?
+
+AI shopping is already happening. The tooling to serve it well does not yet exist as an open, portable standard.
+
+Search engines standardised web content discovery through sitemaps, robots.txt, and canonical tags. RSS standardised content syndication through a single autodiscovery tag. Neither was designed for the kind of structured reasoning that AI agents perform when they decide what to recommend.
+
+This specification fills that gap. It defines:
+
+- How a website signals to AI agents that a structured product feed exists
+- What format that feed takes
+- How intent data (questions, problems, use cases) is structured alongside standard product data
+- How AI agents navigate from a buyer's query to a specific product recommendation
+
+The format is intentionally minimal. It builds on schema.org types that crawlers already understand. It adds the intent layer that makes AI recommendation possible.
+
+---
+
+## How is it different from a Google Merchant Center feed?
+
+| | Google Merchant Center feed | Agenticfeed |
+|---|---|---|
+| Format | XML (RSS-like) | JSON-LD |
+| Schema | Google's proprietary spec | schema.org + agenticfeed namespace |
+| Primary consumer | Price comparison, Shopping ads | AI agents, LLMs, shopping assistants |
+| Discovery | Manual URL submission | Autodiscovery via `<link rel="agenticfeed">` |
+| Intent data | None | Questions, problems, use cases per product |
+| Product context | Price, title, image, availability | Price, title, image + buyer intent layer |
+| Attribution | None built in | UTM parameters on every product URL |
+
+A Google Merchant Center feed tells a machine *what* a product is. An agentic feed tells it *why a specific buyer should choose it*.
+
+The two are complementary. Many merchants use a GMC feed as the data source for generating an agentic feed.
+
+---
+
+## How do AI agents discover it?
+
+The discovery mechanism follows the same autodiscovery pattern the web has used for decades:
+
+```
+rel="stylesheet"   tells browsers where to find CSS
+rel="icon"         tells browsers where to find the favicon
+rel="alternate"    tells crawlers where to find RSS feeds
+rel="agenticfeed"  tells AI agents where to find structured product data
+```
+
+When an AI agent or crawler visits a merchant's website, it reads the page `<head>`. If it finds a `rel="agenticfeed"` tag, it knows exactly where to fetch structured product data without being told the URL in advance.
+
+This means:
+
+1. No manual registration with each AI platform
+2. No API keys or access agreements required
+3. Any AI agent that implements this standard can discover your feed automatically
+4. The merchant controls the data at their own URL
+
+---
+
+## How do I add it to my website?
+
+**Step 1.** Add the discovery tag to every page `<head>`:
+
+```html
+<link rel="agenticfeed" type="application/json" href="https://yourdomain.com/feed.json">
+```
+
+**Step 2.** Serve a JSON-LD feed index at that URL (see [examples/feed.json](examples/feed.json)):
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "DataFeed",
+  "name": "Your Store Name",
+  "url": "https://yourdomain.com/feed.json",
+  "provider": {
+    "@type": "Organization",
+    "name": "Agenticfeed",
+    "url": "https://agenticfeed.ai"
+  },
+  "dataFeedElement": [
+    {
+      "@type": "DataFeedItem",
+      "name": "Questions",
+      "url": "https://yourdomain.com/questions.json"
+    },
+    {
+      "@type": "DataFeedItem",
+      "name": "Problems",
+      "url": "https://yourdomain.com/problems.json"
+    },
+    {
+      "@type": "DataFeedItem",
+      "name": "Use Cases",
+      "url": "https://yourdomain.com/use-cases.json"
+    }
+  ]
+}
+```
+
+**Step 3.** Serve intent endpoints for each category (see [examples/questions.json](examples/questions.json)).
+
+**Step 4.** Serve product detail documents for each product (see [examples/product.json](examples/product.json)).
+
+For Shopify merchants, [agenticfeed.ai](https://agenticfeed.ai) handles all of this automatically including injecting the discovery tag into your theme.
+
+---
+
+## Specification
+
+### 1. Discovery tag
+
+```html
+<link rel="agenticfeed" type="application/json" href="{absolute-url-to-feed-index}">
+```
 
 | Attribute | Value |
 |---|---|
@@ -38,86 +177,57 @@ This follows the same autodiscovery pattern as RSS (`rel="alternate"`) and favic
 | `type` | `application/json` |
 | `href` | Absolute URL to the feed index document |
 
+Place this tag in the `<head>` of every page. It must appear in the server-rendered HTML, not injected by JavaScript, so crawlers can find it without executing scripts.
+
 ---
 
-## 2. Feed Index
-
-The feed index is a JSON-LD document served at the `href` URL from the discovery tag. It identifies the merchant, points to intent endpoints, and tells agents how to resolve product detail.
+### 2. Feed index
 
 **Content-Type:** `application/ld+json`
-
 **Schema.org type:** `DataFeed`
+
+The feed index is the entry point for any agent reading your feed. It identifies the merchant, lists intent endpoints, and provides the URL template for resolving individual products.
 
 See [examples/feed.json](examples/feed.json) for a complete example.
 
-### Required fields
+**Agent workflow:**
 
-| Field | Type | Description |
-|---|---|---|
-| `@context` | string | `https://schema.org` |
-| `@type` | string | `DataFeed` |
-| `name` | string | Merchant name |
-| `url` | string | Absolute URL of this feed index |
-| `provider` | Object | The organisation publishing the feed |
-| `dataFeedElement` | Array | List of intent endpoints |
-| `agenticfeed.resolution` | Object | Template for resolving product detail URLs |
-
-### Discovery workflow for agents
-
-1. Find the feed index via the `rel="agenticfeed"` link tag
-2. Read `dataFeedElement` to find intent endpoints (questions, problems, use cases)
-3. Fetch the relevant intent endpoint based on the buyer's query
-4. Match intent entries to the buyer's need and extract `productId` values
-5. Resolve each `productId` using the `agenticfeed.resolution.product.url` template
-6. Fetch the product detail document for full structured data
+1. Find the discovery tag in the page `<head>`
+2. Fetch the feed index
+3. Read `dataFeedElement` to find intent endpoints
+4. Fetch the relevant endpoint based on the buyer's query type
+5. Match intent entries to the buyer's need and extract product IDs
+6. Resolve each product ID using the `agenticfeed.resolution.product.url` template
+7. Fetch the product detail document
 
 ---
 
-## 3. Intent Endpoints
+### 3. Intent endpoints
 
-Intent endpoints are JSON-LD `ItemList` documents. Each one covers a product category and lists intent entries — each linked to the product that satisfies it.
+Intent endpoints are JSON-LD `ItemList` documents grouped by product category. There are three intent types:
 
-**Content-Type:** `application/ld+json`
-
-There are three intent types:
-
-### Questions
-
-Natural language questions a buyer might ask before purchasing.
-
-**Schema.org type:** `Question` with `suggestedAnswer`
-
+**Questions** — natural language questions a buyer asks before purchasing.
+Schema.org type: `Question` with `suggestedAnswer` pointing to the product URL.
 See [examples/questions.json](examples/questions.json)
 
-### Problems
-
-Pain points or needs that a product addresses.
-
-**Schema.org type:** `ListItem`
-
+**Problems** — pain points or needs the product addresses.
+Schema.org type: `ListItem` with `name` (the problem) and `url` (the product).
 See [examples/problems.json](examples/problems.json)
 
-### Use Cases
-
-Specific scenarios or goals a product is suited for.
-
-**Schema.org type:** `ListItem`
-
+**Use cases** — specific scenarios or goals the product fits.
+Schema.org type: `ListItem` with `name` (the use case) and `url` (the product).
 See [examples/use-cases.json](examples/use-cases.json)
 
 ---
 
-## 4. Product Detail
-
-Each product has its own JSON-LD document at a stable URL. This is what agents fetch after matching intent. It includes full schema.org `Product` data alongside the intent content that earned the match.
+### 4. Product detail
 
 **Content-Type:** `application/ld+json`
-
 **Schema.org type:** `Product`
 
-See [examples/product.json](examples/product.json)
+Each product has its own document at a stable URL. It combines standard schema.org `Product` data with the intent content under an `agenticfeed` namespace.
 
-### Fields
+See [examples/product.json](examples/product.json) for a complete example.
 
 | Field | Type | Description |
 |---|---|---|
@@ -127,73 +237,76 @@ See [examples/product.json](examples/product.json)
 | `url` | string | Merchant product page URL (UTM-tagged) |
 | `image` | string | Primary product image URL |
 | `category` | string | Product category |
-| `offers` | Object | schema.org `Offer` with price, currency, availability |
+| `offers` | Object | schema.org `Offer` — price, currency, availability |
 | `agenticfeed.questions` | Array | Questions this product answers |
 | `agenticfeed.problems` | Array | Problems this product solves |
 | `agenticfeed.use_cases` | Array | Use cases this product fits |
 
 ---
 
-## 5. UTM Attribution
+### 5. UTM attribution
 
-All product URLs served through an agentic feed should include UTM parameters so merchants can track AI agent traffic in their analytics:
+All product URLs in an agentic feed should carry UTM parameters so merchants can measure AI agent traffic in their analytics:
 
 ```
 utm_source=agenticfeed&utm_medium=ai-agent
 ```
 
-This allows merchants to filter sessions and orders originating from AI agent recommendations in Google Analytics, Shopify Analytics, or any platform that reads UTM parameters.
+This lets merchants filter and report on sessions and orders that originated from an AI agent recommendation in Google Analytics, Shopify Analytics, or any platform that reads UTM parameters.
 
 ---
 
-## 6. Link Validation
+### 6. Link validation
 
-Merchants should add the discovery tag to their live website before intent generation begins. The tag in the page `<head>` serves as proof of domain ownership, analogous to Google Search Console's meta tag verification.
+The discovery tag in the merchant's `<head>` serves as proof of domain ownership before a feed goes live. A validator fetches the merchant's homepage, parses the `<head>`, and confirms:
 
-A validator fetches the merchant's homepage, parses the `<head>` section, and checks that:
-- A `rel="agenticfeed"` tag exists
+- A `rel="agenticfeed"` tag is present
 - Its `href` matches the expected feed URL for that merchant
 
----
-
-## URL Structure
-
-The standard does not prescribe specific URL paths. The reference implementation uses:
-
-```
-/feed/{customer_guid}.json              — feed index
-/questions/{customer_guid}.json         — questions category index
-/questions/{customer_guid}/{category}.json  — questions for a category
-/problems/{customer_guid}.json          — problems category index
-/problems/{customer_guid}/{category}.json   — problems for a category
-/use_cases/{customer_guid}.json         — use cases category index
-/use_cases/{customer_guid}/{category}.json  — use cases for a category
-/product/{customer_guid}/{product_guid}.json — product detail
-```
-
-Any stable URL structure is valid as long as the feed index correctly references the intent endpoints and the resolution template is accurate.
+This prevents one merchant from claiming another merchant's domain in a feed.
 
 ---
 
-## Implementation
+## Examples
 
-The reference implementation of this standard is [agenticfeed.ai](https://agenticfeed.ai). It provides:
+All examples are in the [examples/](examples/) directory:
 
-- Automatic product catalogue import from Shopify, WooCommerce, Google Merchant Center feeds, and website crawling
-- AI-generated intent data (questions, problems, use cases) per product using Claude
+| File | Description |
+|---|---|
+| [examples/feed.json](examples/feed.json) | Complete feed index |
+| [examples/product.json](examples/product.json) | Product detail with intent data |
+| [examples/questions.json](examples/questions.json) | Questions endpoint |
+| [examples/problems.json](examples/problems.json) | Problems endpoint |
+| [examples/use-cases.json](examples/use-cases.json) | Use cases endpoint |
+| [examples/link-tag.html](examples/link-tag.html) | Discovery tag snippet |
+
+---
+
+## Reference implementation
+
+[agenticfeed.ai](https://agenticfeed.ai) is the hosted reference implementation of this standard.
+
+It provides:
+
+- Automatic product catalogue import from Shopify, WooCommerce, Google Merchant Center, and website crawling
+- AI-generated intent data (questions, problems, use cases) per product
 - Daily stock and price synchronisation
-- Automatic discovery tag injection into Shopify themes
-- UTM-tagged product URLs for attribution tracking
-- A merchant dashboard for managing feeds, products, and subscriptions
+- Automatic discovery tag injection into Shopify themes via OAuth
+- UTM-tagged product URLs
+- A merchant dashboard for managing feeds and subscriptions
 
----
-
-## Licence
-
-This specification is published under the [MIT Licence](LICENSE). Anyone is free to implement compatible agentic feeds using this standard.
+Merchants who use agenticfeed.ai get a fully conformant agentic feed without writing any code.
 
 ---
 
 ## Contributing
 
-Issues and pull requests are welcome at [github.com/bluestratus/agenticfeed](https://github.com/bluestratus/agenticfeed). The goal is a minimal, stable standard that AI agents can rely on across implementations.
+Issues and pull requests are welcome at [github.com/bluestratus/agenticfeed](https://github.com/bluestratus/agenticfeed).
+
+The goal of this standard is to be minimal and stable. Proposals that add complexity without clear benefit to AI agents or merchants will not be merged. The best contributions are real-world implementation experience, edge cases, and corrections.
+
+---
+
+## Licence
+
+Published under the [MIT Licence](LICENSE). Anyone is free to implement compatible agentic feeds using this standard without restriction.
