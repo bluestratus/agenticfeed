@@ -38,6 +38,11 @@ That tag tells any AI agent or crawler where your structured product feed lives.
   - [4. Product detail](#4-product-detail)
   - [5. UTM attribution](#5-utm-attribution)
   - [6. Link validation](#6-link-validation)
+- [Agent Query API](#agent-query-api)
+  - [Authentication](#authentication)
+  - [Request](#request)
+  - [Response](#response)
+  - [Agent Card](#agent-card)
 - [Examples](#examples)
 - [Reference implementation](#reference-implementation)
 - [Contributing](#contributing)
@@ -267,6 +272,107 @@ This prevents one merchant from claiming another merchant's domain in a feed.
 
 ---
 
+## Agent Query API
+
+The passive feed endpoints let AI agents crawl product data at their own pace. The Agent Query API is the active layer — an AI agent or application can send a natural language buyer intent and receive back a ranked list of matched products with reasons.
+
+This is agent-to-agent communication. Instead of a human typing into a search box, one AI asks another AI to find the best matching products.
+
+**Endpoint**
+
+```
+POST https://agenticfeed.ai/agent/query
+Content-Type: application/json
+Authorization: Bearer af_your_api_key
+```
+
+---
+
+### Authentication
+
+Two keys are required:
+
+**1. Agenticfeed API key** — passed as a `Bearer` token in the `Authorization` header. This identifies who is making the request and controls access to the feed data. Generate one at [agenticfeed.ai/dashboard.html](https://agenticfeed.ai/dashboard.html).
+
+**2. Anthropic API key** — passed in the request body as `anthropic_api_key`. This is your own key from [console.anthropic.com](https://console.anthropic.com). Agenticfeed uses it to run the matching call against Claude. You pay Anthropic directly for the AI compute — Agenticfeed does not charge for or subsidise this.
+
+If you omit `anthropic_api_key`, the request will be rejected unless the implementation has a fallback key configured. The reference implementation requires callers to supply their own.
+
+Your Anthropic key is validated with a minimal one-token call before any database work is done. An invalid key is rejected immediately with a clear error.
+
+---
+
+### Request
+
+```json
+{
+  "query": "ergonomic chair for someone with lower back pain, works from home 10 hours a day, small home office, budget under £300",
+  "anthropic_api_key": "sk-ant-your-key",
+  "customer_guid": "a9a8378c94",
+  "limit": 5
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `query` | string | Yes | Natural language description of what the buyer needs |
+| `anthropic_api_key` | string | Yes | Your Anthropic API key — you pay for the AI call |
+| `customer_guid` | string | No | The merchant feed to query. Defaults to the feed linked to your API key |
+| `limit` | integer | No | Maximum results to return (1–10, default 5) |
+
+---
+
+### Response
+
+Returns a schema.org `ItemList` of matched `Product` entries, each with a `match_reason` explaining why that product fits the buyer's need.
+
+**Content-Type:** `application/ld+json`
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "query": "ergonomic chair for back pain...",
+  "numberOfItems": 3,
+  "itemListElement": [
+    {
+      "@type": "Product",
+      "position": 1,
+      "name": "HM Seating Contessa Chair",
+      "url": "https://merchant.com/contessa?utm_source=agenticfeed&utm_medium=ai-agent",
+      "image": "https://merchant.com/images/contessa.jpg",
+      "category": "office chairs",
+      "offers": {
+        "@type": "Offer",
+        "price": "249.00",
+        "priceCurrency": "GBP",
+        "availability": "https://schema.org/InStock"
+      },
+      "agenticfeed": {
+        "product_id": "b3f1e29a4c",
+        "match_reason": "Matches adjustable lumbar support, compact footprint for small spaces, and falls within the stated budget."
+      }
+    }
+  ]
+}
+```
+
+The `match_reason` field is designed to be passed directly to the end buyer by the calling agent. It explains the recommendation in plain language without requiring the agent to do any additional reasoning.
+
+---
+
+### Agent Card
+
+The reference implementation publishes an A2A-compatible Agent Card at:
+
+```
+GET https://agenticfeed.ai/.well-known/agent.json
+```
+
+This file describes the agent's capabilities, accepted inputs, output format, and authentication requirements in a machine-readable format. AI platforms that implement Google's Agent-to-Agent (A2A) protocol can discover and call the query endpoint automatically using this card.
+
+---
+
 ## Examples
 
 All examples are in the [examples/](examples/) directory:
@@ -292,10 +398,12 @@ It provides:
 - AI-generated intent data (questions, problems, use cases) per product
 - Daily stock and price synchronisation
 - Automatic discovery tag injection into Shopify themes via OAuth
-- UTM-tagged product URLs
+- UTM-tagged product URLs for attribution tracking
 - A merchant dashboard for managing feeds and subscriptions
+- Agent Query API at `/agent/query` for natural language product matching
+- A2A-compatible Agent Card at `/.well-known/agent.json`
 
-Merchants who use agenticfeed.ai get a fully conformant agentic feed without writing any code.
+Merchants who use agenticfeed.ai get a fully conformant agentic feed without writing any code. Developers who want to query product data by buyer intent can use the Agent Query API with their own Anthropic key.
 
 ---
 
