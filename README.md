@@ -1,6 +1,6 @@
 # Agenticfeed Standard
 
-[![Version](https://img.shields.io/badge/version-0.1.0-72e0a8)](https://github.com/bluestratus/agenticfeed/releases/tag/v0.1.0)
+[![Version](https://img.shields.io/badge/version-0.2.0-72e0a8)](https://github.com/bluestratus/agenticfeed/releases/tag/v0.2.0)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Reference implementation](https://img.shields.io/badge/reference_implementation-agenticfeed.ai-0d0d1a)](https://agenticfeed.ai)
 
