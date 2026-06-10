@@ -290,15 +290,9 @@ Authorization: Bearer af_your_api_key
 
 ### Authentication
 
-Two keys are required:
+One API key is required:
 
-**1. Agenticfeed API key** — passed as a `Bearer` token in the `Authorization` header. This identifies who is making the request and controls access to the feed data. Generate one at [agenticfeed.ai/dashboard.html](https://agenticfeed.ai/dashboard.html).
-
-**2. Anthropic API key** — passed in the request body as `anthropic_api_key`. This is your own key from [console.anthropic.com](https://console.anthropic.com). Agenticfeed uses it to run the matching call against Claude. You pay Anthropic directly for the AI compute — Agenticfeed does not charge for or subsidise this.
-
-If you omit `anthropic_api_key`, the request will be rejected unless the implementation has a fallback key configured. The reference implementation requires callers to supply their own.
-
-Your Anthropic key is validated with a minimal one-token call before any database work is done. An invalid key is rejected immediately with a clear error.
+**Agenticfeed API key** — passed as a `Bearer` token in the `Authorization` header. This identifies who is making the request and controls access to the feed data. Generate one in **Dashboard › API Keys** for any paid plan (Growth and above). No approval needed — keys are available instantly.
 
 ---
 
@@ -307,7 +301,6 @@ Your Anthropic key is validated with a minimal one-token call before any databas
 ```json
 {
   "query": "ergonomic chair for someone with lower back pain, works from home 10 hours a day, small home office, budget under £300",
-  "anthropic_api_key": "sk-ant-your-key",
   "customer_guid": "a9a8378c94",
   "limit": 5
 }
@@ -316,7 +309,6 @@ Your Anthropic key is validated with a minimal one-token call before any databas
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `query` | string | Yes | Natural language description of what the buyer needs |
-| `anthropic_api_key` | string | Yes | Your Anthropic API key — you pay for the AI call |
 | `customer_guid` | string | No | The merchant feed to query. Defaults to the feed linked to your API key |
 | `limit` | integer | No | Maximum results to return (1–10, default 5) |
 
@@ -400,10 +392,10 @@ It provides:
 - Automatic discovery tag injection into Shopify themes via OAuth
 - UTM-tagged product URLs for attribution tracking
 - A merchant dashboard for managing feeds and subscriptions
-- Agent Query API at `/agent/query` for natural language product matching
+- Agent Query API at `/agent/query` for natural language product matching (included with paid plans)
 - A2A-compatible Agent Card at `/.well-known/agent.json`
 
-Merchants who use agenticfeed.ai get a fully conformant agentic feed without writing any code. Developers who want to query product data by buyer intent can use the Agent Query API with their own Anthropic key.
+Merchants who use agenticfeed.ai get a fully conformant agentic feed without writing any code. Developers building AI agents can query product data by buyer intent using the Agent Query API, included with all paid merchant plans.
 
 ---
 
